@@ -1,114 +1,114 @@
 import { assert } from 'chai';
 import { randomValue as random, randomStringArray } from '../helper';
 import {
-    bindFunction,
-    defaultParameterValue,
-    returnArgumentsArray,
-    returnCounter,
-    returnFirstArgument,
-    returnFnResult
+  bindFunction,
+  defaultParameterValue,
+  returnArgumentsArray,
+  returnCounter,
+  returnFirstArgument,
+  returnFnResult
 } from '../src/index';
 
 describe('ДЗ 1 - функции', () => {
-    describe('returnFirstArgument', () => {
-        it('должна возвращать переданный аргумент', () => {
-            let value = random();
-            let result = returnFirstArgument(value);
+  describe('returnFirstArgument', () => {
+    it('должна возвращать переданный аргумент', () => {
+      let value = random();
+      let result = returnFirstArgument(value);
 
-            assert.strictEqual(result, value);
-        });
+      assert.strictEqual(result, value);
+    });
+  });
+
+  describe('defaultParameterValue', () => {
+    it('должна возвращать сумму переданных аргументов', () => {
+      let valueA = random('number');
+      let valueB = random('number');
+      let result = defaultParameterValue(valueA, valueB);
+
+      assert.strictEqual(result, valueA + valueB);
     });
 
-    describe('defaultParameterValue', () => {
-        it('должна возвращать сумму переданных аргументов', () => {
-            let valueA = random('number');
-            let valueB = random('number');
-            let result = defaultParameterValue(valueA, valueB);
+    it('значение по умолчанию второго аргумента должно быть 100', () => {
+      let value = random('number');
+      let result = defaultParameterValue(value);
 
-            assert.strictEqual(result, valueA + valueB);
-        });
+      assert.strictEqual(result, value + 100);
+    });
+  });
 
-        it('значение по умолчанию второго аргумента должно быть 100', () => {
-            let value = random('number');
-            let result = defaultParameterValue(value);
+  describe('returnArgumentsArray', () => {
+    it('должна возвращать переданные аргументы в виде массива', () => {
+      let result;
+      let value;
 
-            assert.strictEqual(result, value + 100);
-        });
+      value = random('array', 1);
+      result = returnArgumentsArray(...value);
+      assert.deepEqual(result, value);
     });
 
-    describe('returnArgumentsArray', () => {
-        it('должна возвращать переданные аргументы в виде массива', () => {
-            let result;
-            let value;
+    it('должна возвращать пустой массив если нет аргументов', () => {
+      let result = returnArgumentsArray();
 
-            value = random('array', 1);
-            result = returnArgumentsArray(...value);
-            assert.deepEqual(result, value);
-        });
+      assert.deepEqual(result, []);
+    });
+  });
 
-        it('должна возвращать пустой массив если нет аргументов', () => {
-            let result = returnArgumentsArray();
+  describe('returnFnResult', () => {
+    it('должна возвращать результат вызова переданной функции', () => {
+      function fn() {
+        return value;
+      }
 
-            assert.deepEqual(result, []);
-        });
+      let value = random();
+      let result = returnFnResult(fn);
+
+      assert.strictEqual(result, value);
+    });
+  });
+
+  describe('returnCounter', () => {
+    it('должна возвращать функцию', () => {
+      let result = returnCounter();
+
+      assert.typeOf(result, 'function');
     });
 
-    describe('returnFnResult', () => {
-        it('должна возвращать результат вызова переданной функции', () => {
-            function fn() {
-                return value;
-            }
+    it('возвращаемая функция должна увеличивать переданное число на единицу при каждом вызове', () => {
+      let value = random('number');
+      let result = returnCounter(value);
 
-            let value = random();
-            let result = returnFnResult(fn);
-
-            assert.strictEqual(result, value);
-        });
+      assert.equal(result(), value + 1);
+      assert.equal(result(), value + 2);
+      assert.equal(result(), value + 3);
     });
 
-    describe('returnCounter', () => {
-        it('должна возвращать функцию', () => {
-            let result = returnCounter();
+    it('значение аргумента должно быть 0 по умолчанию', () => {
+      let result = returnCounter();
 
-            assert.typeOf(result, 'function');
-        });
+      assert.equal(result(), 1);
+      assert.equal(result(), 2);
+      assert.equal(result(), 3);
+    });
+  });
 
-        it('возвращаемая функция должна увеличивать переданное число на единицу при каждом вызове', () => {
-            let value = random('number');
-            let result = returnCounter(value);
+  describe('bindFunction', () => {
+    let valuesArr = randomStringArray();
 
-            assert.equal(result(), value + 1);
-            assert.equal(result(), value + 2);
-            assert.equal(result(), value + 3);
-        });
+    function fn(...valuesArr) {
+      return [...arguments].join('');
+    }
 
-        it('значение аргумента должно быть 0 по умолчанию', () => {
-            let result = returnCounter();
+    it('должна возвращать функцию', () => {
+      let result = bindFunction(fn);
 
-            assert.equal(result(), 1);
-            assert.equal(result(), 2);
-            assert.equal(result(), 3);
-        });
+      assert.typeOf(result, 'function');
     });
 
-    describe('bindFunction', () => {
-        let valuesArr = randomStringArray();
+    it('должна привязывать любое кол-во аргументов возвращаемой функции', () => {
 
-        function fn(...valuesArr) {
-            return [...arguments].join('');
-        }
+      let result = bindFunction(fn, ...valuesArr);
 
-        it('должна возвращать функцию', () => {
-            let result = bindFunction(fn);
-
-            assert.typeOf(result, 'function');
-        });
-
-        it('должна привязывать любое кол-во аргументов возвращаемой функции', () => {
-
-            let result = bindFunction(fn, ...valuesArr);
-
-            assert.equal(result(), valuesArr.join(''));
-        });
+      assert.equal(result(), valuesArr.join(''));
     });
+  });
 });
